@@ -1227,6 +1227,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
     if(urlencode) {
       const char *i;
       char *o;
+      bool free_part = FALSE;
       char *enc = malloc(nalloc * 3 + 1); /* for worst case! */
       if(!enc)
         return CURLUE_OUT_OF_MEMORY;
@@ -1241,6 +1242,7 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
           free(enc);
           return CURLUE_OUT_OF_MEMORY;
         }
+        free_part = TRUE;
       }
       for(i = part, o = enc; *i; i++) {
         if(Curl_isunreserved(*i) ||
@@ -1257,6 +1259,8 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
       }
       *o = 0; /* zero terminate */
       newp = enc;
+      if(free_part)
+        free((char *)part);
     }
     else {
       char *p;
